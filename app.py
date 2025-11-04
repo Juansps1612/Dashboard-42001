@@ -11,7 +11,14 @@ df_activos = pd.read_excel(file_path, sheet_name="2. Identificación de Activos"
 st.title("Dashboard ISO 42001")
 
 # Crear pestañas
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Anexo A", "Identificación de Activos", "Identificación de riesgos", "Matriz de evaluación de riesgos", "Plan de tratamiento del riesgo"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "Anexo A", 
+    "Identificación de Activos", 
+    "Identificación de riesgos", 
+    "Matriz de evaluación de riesgos", 
+    "Plan de tratamiento del riesgo",
+    "Informe ISO 42001"
+])
 
 # Cargar hoja para la cuarta pestaña
 df_tratamiento = pd.read_excel(file_path, sheet_name="Anexo A")
@@ -211,3 +218,30 @@ with tab5:
     df_tratamiento.columns = df_tratamiento.columns.str.strip()
 
     st.dataframe(df_tratamiento, use_container_width=True)
+
+# Sexta pestaña: visor del informe PDF
+with tab6:
+    st.title("Informe ISO/IEC 42001:2023")
+
+    pdf_path = "Informe ISO 42001.pdf"  # Ruta del informe PDF
+
+    try:
+        with open(pdf_path, "rb") as f:
+            pdf_bytes = f.read()
+
+        # Mostrar visor PDF incrustado
+        import base64
+        base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800"></iframe>'
+        st.markdown(pdf_display, unsafe_allow_html=True)
+
+        # Botón para descargar
+        st.download_button(
+            label="📄 Descargar Informe ISO 42001",
+            data=pdf_bytes,
+            file_name="Informe_ISO_42001.pdf",
+            mime="application/pdf"
+        )
+
+    except FileNotFoundError:
+        st.error("No se encontró el archivo PDF del informe. Verifica la ruta o nombre del archivo.")
